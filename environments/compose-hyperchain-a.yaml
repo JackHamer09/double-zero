@@ -1,4 +1,4 @@
-name: 'double-zero-app'
+name: 'private-chain-a'
 services:
   app:
     build:
@@ -100,7 +100,7 @@ services:
       context: ..
       dockerfile: ./packages/private-rpc/Dockerfile
     volumes:
-      - ./compose-hyperchain-permissions.yaml:/app/permissions.yaml
+      - ./compose-hyperchain-permissions-a.yaml:/app/permissions.yaml
     depends_on:
       db-private-rpc:
         condition: service_healthy

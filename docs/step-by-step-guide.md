@@ -16,7 +16,7 @@ customized configurations.
 ZKstack requires Rust to be installed. The simplest way to install Rust is through Rustup. While you can use any
 installation method you prefer, make sure you have an up-to-date version.
 
-```
+```bash
 # rustup
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
@@ -40,7 +40,7 @@ continue: https://docs.docker.com/engine/install/
 Once rust is installed we can install `zkstack`. The easiest way to do this is installing `zkstackup` (a version manager
 for zkstack) and then use that to install zkstack:
 
-```
+```bash
 # Install zkstackup
 curl -L https://raw.githubusercontent.com/matter-labs/zksync-era/main/zkstack_cli/zkstackup/install | bash
 
@@ -58,13 +58,13 @@ Ensure to have to following ports free:
 - 5432
 - 8545
 
-Now we need to create the ecosystem. This command is going to promp you with a wizzard to do the initial configuration
+Now we need to create the ecosystem. This command is going to promp you with a wizard to do the initial configuration
 of the network. Double zero can work with any configuration, but the framework is meant to be used with a validium
-chain.
+chain. For the `Validium type`, feel free to select `NoDA`.
 
-Also, it’s good to avoid using the default chain id. For this example we are going to use `54678` .
+Also, it’s good to avoid using the default chain id. For this example we are going to use `271` .
 
-```
+```bash
 zkstack ecosystem create
 ```
 
@@ -72,7 +72,7 @@ zkstack ecosystem create
 
 Once everything is set, you can start your chain:
 
-```
+```bash
 cd <your_chain>
 
 zkstack ecosystem init --dev
@@ -92,7 +92,7 @@ You are going to be prompted about the versions of compilers that you want to su
 
 In a new terminal run the following commands:
 
-```
+```bash
 zkstack contract-verifier init
 
 zkstack contract-verifier run
@@ -134,7 +134,7 @@ written in nodejs and they are meant to be easy to run and configure. Let’s go
 
 Open a new terminal and run the following:
 
-```
+```bash
 # clone repo
 git clone git@github.com:Moonsong-Labs/double-zero.git
 cd double-zero
@@ -149,7 +149,7 @@ ip:
 
 ```bash
 # linux
-ifconfig wlan0 | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}'
+ip -4 addr show wlan0 | grep -oP ‘(?<=inet\s)\d+(\.\d+){3}’ | grep -Fv 127.0.0.1
 
 # mac
 ipconfig getifaddr en0
@@ -183,7 +183,7 @@ APP_BRIDGE_URL=http://localhost:3000/bridge
 APP_HOSTNAMES=localhost
 APP_ICON=/images/icons/zksync-arrows.svg
 # Here you need to set your chain id
-APP_L2_CHAIN_ID=54678 # <-- your chain id.
+APP_L2_CHAIN_ID=271 # <-- your chain id.
 APP_L2_NETWORK_NAME=Double Zero Local
 APP_MAINTENANCE=false
 APP_NAME=local
@@ -207,7 +207,7 @@ working going with your browser to [http://localhost:3010](http://localhost:3010
 
 Once you check that stop the process doing `CTRL-C`. We still need to configure the access to our dapp before continue.
 
-# 3 - Deploy dapp
+## 3 - Deploy dapp
 
 We are going to use an example dapp to integrate the entire stack. The dapp is a really simple constant product amm that
 can be used to make swaps between 2 tokens. Let’s start:
@@ -230,36 +230,26 @@ funds that you got on point `1.7` , so you are going to need the private key of 
 The following commands deploy the scripts:
 
 ```bash
-export RPC_URL="http://localhost:3050"
- export PRIVATE_KEY="<your private key>" # space at the beggining to avoid save this into shell history
-export PREMIUM_USER_ADDRESS="some_address" # another address that you control
-export BASIC_USER_ADDRESS="some_address" # a third address that you control
+export PREMIUM_USER_ADDRESS="some_address" # address that you control (for Chain A)
+export BASIC_USER_ADDRESS="some_address" # second address that you control (for Chain B)
 
 cd contracts
 ./scripts/deploy.sh
 ```
-
-You should see at the end an output like this:
-
-```bash
-DAI: 0x...
-WBTC: 0x...
-CPAMM: 0x...
-```
-
-Take note of the 3 addresses, they are going to be used in the next step.
+At the end of the process you'll see multiple contract addresses.
+Take note of them, they are going to be used in the next step.
 
 After running this script:
 
-- The contracts are not deployed.
-- The 3 addresses have received some tokens to test everything.
-- The deployer was registered as a VIP user and PREMIUM_USER_ADDRESS as a premium userr.
+- The contracts are deployed.
+- The deployer was registered as a VIP user and PREMIUM_USER_ADDRESS as a premium user.
+- PREMIUM_USER_ADDRESS received test tokens on Chain A. BASIC_USER_ADDRESS received test tokens on Chain B.
 
 ### 3.3 - Configure double zero permissions
 
-Let’s go back to the double zero repo. We have to edit this file: `envieronments/compose-hyperchain-permissions.yaml`
+Let’s go back to the double zero repo. We have to edit this file: `environments/compose-hyperchain-permissions-a.yaml` and `environments/compose-hyperchain-permissions-b.yaml`
 
-This files defined the access for permissions for each contract. This is what we are going to do
+This files define the access for permissions for each contract. This is what we are going to do
 
 ```bash
 groups:
@@ -271,17 +261,21 @@ contracts:
   - address: "<cpamm_address>" # <-- EDIT HERE
     methods:
       #...
-  # DAI
-  - address: "<dai_address>" # <-- EDIT HERE
+  # TradeEscrow.sol
+  - address: "<trade_escrow_address>" # <-- EDIT HERE
+    methods:
+      #...
+  # USDG
+  - address: "<usdg_address>" # <-- EDIT HERE
     methods:
       # ...
-  # WBTC
-  - address: "<wbtc_address>" # <-- EDIT HERE
+  # wAAPL
+  - address: "<waapl_address>" # <-- EDIT HERE
     methods:
       # ...
 ```
 
-Now you can run all the double zero services again, this time we are going to leave them up:
+Now you can run all the double zero services for both chains, this time we are going to leave them up:
 
 ```bash
 ./environments/launch-hyperchain-env.sh
@@ -296,17 +290,7 @@ cd web
 cp .env.example .env
 ```
 
-Now edit the .env file with the following content:
-
-```bash
-NEXT_PUBLIC_RPC_URL="http://localhost:3050"
-NEXT_PUBLIC_CHAIN_ID="54678"
-NEXT_PUBLIC_CPAMM_ADDRESS="<cpam_addr_from_previous_step>"
-NEXT_PUBLIC_DAI_ADDRESS="<dai_addr_from_previous_step>"
-NEXT_PUBLIC_WBTC_ADDRESS="<weth_addr_from_previous_step>"
-NEXT_PUBLIC_CHAIN_NAME="Local Chain"
-NEXT_PUBLIC_BLOCK_EXPLORER_URL="http://localhost:3010"
-```
+Now edit the .env file by filling missing contract addresses.
 
 ### 3.5 - Run the frontend of the dapp
 

@@ -1,0 +1,156 @@
+name: 'private-chain-a'
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: ./packages/app/Dockerfile
+      args:
+        VITE_API_URL: ${APP_API_URL}
+        VITE_BRIDGE_URL: ${APP_BRIDGE_URL}
+        VITE_HOSTNAMES: ${APP_HOSTNAMES}
+        VITE_ICON: ${APP_ICON}
+        VITE_L2_CHAIN_ID: ${APP_L2_CHAIN_ID}
+        VITE_L2_NETWORK_NAME: ${APP_L2_NETWORK_NAME}
+        VITE_MAINTENANCE: ${APP_MAINTENANCE}
+        VITE_NAME: ${APP_NAME}
+        VITE_PUBLISHED: ${APP_PUBLISHED}
+        VITE_RPC_URL: ${APP_RPC_URL}
+        VITE_BASE_TOKEN_ADDRESS: ${APP_BASE_TOKEN_ADDRESS}
+    ports:
+      - '3110:3110'
+    depends_on:
+      - proxy
+    restart: unless-stopped
+
+  data-fetcher:
+    build:
+      context: ..
+      dockerfile: ./packages/data-fetcher/Dockerfile
+    environment:
+      PORT: "3140"
+      LOG_LEVEL: "verbose"
+      BLOCKCHAIN_RPC_URL: ${TARGET_RPC}
+    restart: on-failure
+
+  worker:
+    build:
+      context: ..
+      dockerfile: ./packages/worker/Dockerfile
+    environment:
+      PORT: "3101"
+      LOG_LEVEL: "verbose"
+      DATABASE_HOST: "explorer-db"
+      DATABASE_USER: "postgres"
+      DATABASE_PASSWORD: "postgres"
+      DATABASE_NAME: "block-explorer"
+      BLOCKCHAIN_RPC_URL: ${TARGET_RPC}
+      DATA_FETCHER_URL: "http://data-fetcher:3140"
+      BATCHES_PROCESSING_POLLING_INTERVAL: "1000"
+    depends_on:
+      data-fetcher:
+        condition: service_started
+      explorer-db:
+        condition: service_healthy
+    restart: on-failure
+
+  api:
+    build:
+      context: ..
+      dockerfile: ./packages/api/Dockerfile
+    ports:
+      - "3121:3121"
+    environment:
+      PORT: "3121"
+      METRICS_PORT: "3105"
+      LOG_LEVEL: "verbose"
+      DATABASE_URL: "postgres://postgres:postgres@explorer-db:5532/block-explorer"
+      CONTRACT_VERIFICATION_API_URL: ${CONTRACT_VERIFICATION_API_URL}
+    depends_on:
+      - worker
+    restart: unless-stopped
+
+  proxy:
+    build:
+      context: ..
+      dockerfile: ./packages/proxy/Dockerfile
+    ports:
+      - "4140:4140"
+    environment:
+      SERVER_PORT: 4140
+      BLOCK_EXPLORER_API_URL: http://api:3121
+      SESSION_SECRET: "0101010101010101010101010101010101010101010101010101010101010101"
+      CORS_ORIGIN: ${CORS_ORIGIN_PROXY}
+      RPC_URL: ${TARGET_RPC}
+      USER_TOKEN_URL: http://private-rpc:4141/users
+      CREATE_TOKEN_SECRET: ${CREATE_TOKEN_SECRET}
+
+  private-rpc-migrate:
+    build:
+      context: ..
+      dockerfile: ./packages/private-rpc/Dockerfile
+    command: sh -c "yarn db:migrate"
+    depends_on:
+      db-private-rpc:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@db-private-rpc:5532/private-rpc"
+
+  private-rpc:
+    build:
+      context: ..
+      dockerfile: ./packages/private-rpc/Dockerfile
+    volumes:
+      - ./compose-hyperchain-permissions-b.yaml:/app/permissions.yaml
+    depends_on:
+      db-private-rpc:
+        condition: service_healthy
+      private-rpc-migrate:
+        condition: service_completed_successfully
+    ports:
+      - '4141:4141'
+    environment:
+      PORT: "4141"
+      DATABASE_URL: "postgres://postgres:postgres@db-private-rpc:5532/private-rpc"
+      TARGET_RPC: ${TARGET_RPC}
+      PERMISSIONS_YAML_PATH: "/app/permissions.yaml"
+      CORS_ORIGIN: ${CORS_ORIGIN_RPC}
+      CREATE_TOKEN_SECRET: ${CREATE_TOKEN_SECRET}
+
+  db-private-rpc:
+    image: "postgres:14"
+    logging:
+      driver: none
+    volumes:
+      - db-private-rpc:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=private-rpc
+
+  explorer-db:
+    image: "postgres:14"
+    logging:
+      driver: none
+    volumes:
+      - explorer-db:/var/lib/postgresql/data
+    ports:
+      - "5533:5532"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "block-explorer"
+
+
+volumes:
+  db-private-rpc:
+  explorer-db:

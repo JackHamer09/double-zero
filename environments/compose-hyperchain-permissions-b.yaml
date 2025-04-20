@@ -1,48 +1,10 @@
 groups:
   - name: admins
     members:
-      - "0xeaAFbF6Fc352B0598e34f4F282939720D9cf0f59"
+      - "0x36615Cf349d7F6344891B1e7CA7C72883F5dc049" # Default Rich account
 contracts:
-  # CPAMM
-  - address: "0x15607E87A1176Fd116e5609e1b4D35609c9D563f"
-    methods:
-      - signature: function getReserves() external view returns (uint256, uint256)
-        read:
-          type: public
-        write:
-          type: closed
-      - signature: function swap(address _tokenIn, uint256 _amountIn) external returns (uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function addLiquidity(uint256 _amount0, uint256 _amount1) external returns (uint256 shares)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function removeLiquidity(uint256 _shares) external returns (uint256 amount0, uint256 amount1)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function getUserFee(address user) returns (uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function getRemainingDailyAllowance(address) returns (uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function balanceOf(address) returns (uint256)
-        read:
-          type: public
-        write:
-          type: closed
-  # DAI
-  - address: "0x000139E9bc2C5079A8CE3aA87D3b5E8b50A85797"
+  # USDG
+  - address: "0x49F4849e730Ea4AfE26b43693b9F1b81c21b1b02"
     methods:
       - signature: function decimals() public view virtual returns (uint8)
         read:
@@ -128,8 +90,8 @@ contracts:
           type: public
         write:
           type: public
-  # WBTC
-  - address: "0x0764b659ea3153E3fa36F83e4Bf4cAC2b3d4c796"
+  # wAAPL
+  - address: "0xcB4305db20D1ABB16cb531AaD36dAE4A133FA601"
     methods:
       - signature: function decimals() public view virtual returns (uint8)
         read:
