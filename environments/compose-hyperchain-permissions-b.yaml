@@ -16,6 +16,11 @@ contracts:
           type: public
         write:
           type: public
+      - signature: function name() public view virtual returns (string memory)
+        read:
+          type: public
+        write:
+          type: public
       - signature: function symbol() public view virtual returns (string memory)
         read:
           type: public
@@ -99,6 +104,11 @@ contracts:
         write:
           type: public
       - signature: function mint(address _to, uint256 _amount) public returns (bool)
+        read:
+          type: public
+        write:
+          type: public
+      - signature: function name() public view virtual returns (string memory)
         read:
           type: public
         write:
@@ -188,7 +198,7 @@ contracts:
   # L2_INTEROP_CENTER_ADDRESS
   - address: "0x000000000000000000000000000000000001000a"
     methods:
-      - signature: function requestInterop(uint256 _destinationChainId, address _executionAddress, tuple[] _feePaymentCallStarters, tuple[] _executionCallStarters, tuple _gasFields) payable returns (bytes32 canonicalTxHash)
+      - signature: function requestInterop(uint256,address,(bool,address,bytes,uint256,uint256)[],(bool,address,bytes,uint256,uint256)[],(uint256,uint256,address,address,bytes)) external payable returns (bytes32)
         read:
           type: public
         write:
