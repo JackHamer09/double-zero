@@ -197,7 +197,13 @@ Once the configuration is in place you can run the double zero services.
 ### 2.3 - Launch
 
 ```bash
-./environments/launch-hyperchain-env.sh
+./environments/launch-hyperchain-env-a.sh
+```
+
+after chain A infrastructure was started, start chain B infra from another terminal:
+
+```bash
+./environments/launch-hyperchain-env-b.sh
 ```
 
 This is going to run all the services of double zero using docker. At this stage you can check that the explorer is
@@ -278,7 +284,13 @@ contracts:
 Now you can run all the double zero services for both chains, this time we are going to leave them up:
 
 ```bash
-./environments/launch-hyperchain-env.sh
+./environments/launch-hyperchain-env-a.sh
+```
+
+after chain A infrastructure was started, start chain B infra from another terminal:
+
+```bash
+./environments/launch-hyperchain-env-b.sh
 ```
 
 ### 3.4 - Configure and run dapp frontend

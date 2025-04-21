@@ -177,3 +177,19 @@ contracts:
           type: public
         write:
           type: public
+  # L2_INTEROP_HANDLER
+  - address: "0x000000000000000000000000000000000001000b"
+    methods:
+      - signature: function getAliasedAccount(address fromAsSalt, uint256) view returns (address)
+        read:
+          type: public
+        write:
+          type: closed
+  # L2_INTEROP_CENTER_ADDRESS
+  - address: "0x000000000000000000000000000000000001000a"
+    methods:
+      - signature: function requestInterop(uint256 _destinationChainId, address _executionAddress, tuple[] _feePaymentCallStarters, tuple[] _executionCallStarters, tuple _gasFields) payable returns (bytes32 canonicalTxHash)
+        read:
+          type: public
+        write:
+          type: public

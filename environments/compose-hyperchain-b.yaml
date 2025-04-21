@@ -1,4 +1,4 @@
-name: 'private-chain-a'
+name: 'private-chain-b'
 services:
   app:
     build:
@@ -17,7 +17,7 @@ services:
         VITE_RPC_URL: ${APP_RPC_URL}
         VITE_BASE_TOKEN_ADDRESS: ${APP_BASE_TOKEN_ADDRESS}
     ports:
-      - '3110:3110'
+      - '3110:3010'
     depends_on:
       - proxy
     restart: unless-stopped
@@ -40,6 +40,7 @@ services:
       PORT: "3101"
       LOG_LEVEL: "verbose"
       DATABASE_HOST: "explorer-db"
+      DATABASE_PORT: "5532"
       DATABASE_USER: "postgres"
       DATABASE_PASSWORD: "postgres"
       DATABASE_NAME: "block-explorer"
@@ -122,8 +123,9 @@ services:
       driver: none
     volumes:
       - db-private-rpc:/var/lib/postgresql/data
+    command: ["postgres", "-p", "5532"]
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -p 5532" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -140,8 +142,9 @@ services:
       - explorer-db:/var/lib/postgresql/data
     ports:
       - "5533:5532"
+    command: ["postgres", "-p", "5532"]
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -p 5532" ]
       interval: 5s
       timeout: 5s
       retries: 5
