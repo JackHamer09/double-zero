@@ -4,7 +4,7 @@ groups:
       - "0x36615Cf349d7F6344891B1e7CA7C72883F5dc049" # Default Rich account
 contracts:
   # USDG
-  - address: "0x49F4849e730Ea4AfE26b43693b9F1b81c21b1b02"
+  - address: "update_address_here"
     methods:
       - signature: function decimals() public view virtual returns (uint8)
         read:
@@ -96,7 +96,7 @@ contracts:
         write:
           type: public
   # wAAPL
-  - address: "0xcB4305db20D1ABB16cb531AaD36dAE4A133FA601"
+  - address: "update_address_here"
     methods:
       - signature: function decimals() public view virtual returns (uint8)
         read:

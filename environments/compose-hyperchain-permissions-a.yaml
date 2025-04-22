@@ -4,7 +4,7 @@ groups:
       - "0x36615Cf349d7F6344891B1e7CA7C72883F5dc049" # Default Rich account
 contracts:
   # CPAMM
-  - address: "0x9201F71D61F799449d2a5C85aa3498307371b5fE"
+  - address: "update_address_here"
     methods:
       - signature: function getReserves() external view returns (uint256, uint256)
         read:
@@ -47,7 +47,7 @@ contracts:
         write:
           type: closed
   # TradeEscrow.sol
-  - address: "0x1f8739025D7f95D026688cfBB70579e00bC33148"
+  - address: "update_address_here"
     methods:
       - signature: function acceptTrade(uint256)
         read:
@@ -91,7 +91,7 @@ contracts:
         write:
           type: closed
   # USDG
-  - address: "0xf290e056d3C49e026fEfe41eA4017CF6d22e57bd"
+  - address: "update_address_here"
     methods:
       - signature: function decimals() public view virtual returns (uint8)
         read:
@@ -183,7 +183,7 @@ contracts:
         write:
           type: public
   # wAAPL
-  - address: "0x469696e7b648254451771C28A51f5Ed8e3301a9e"
+  - address: "update_address_here"
     methods:
       - signature: function decimals() public view virtual returns (uint8)
         read:
