@@ -48,99 +48,90 @@ curl -L https://raw.githubusercontent.com/matter-labs/zksync-era/main/zkstack_cl
 zkstackup
 ```
 
-### 1.5 - Create a new ecosystem
+### 1.5 - Clone zksync-era repo
 
-Now that zkstack is installed we can use it to create our own validium chain. Zkstack has the concept of `ecosystems`
-that are basically everything needed to have a chain running.
-
-Ensure to have to following ports free:
-
-- 5432
-- 8545
-
-Now we need to create the ecosystem. This command is going to promp you with a wizard to do the initial configuration
-of the network. Double zero can work with any configuration, but the framework is meant to be used with a validium
-chain. For the `Validium type`, feel free to select `NoDA`.
-
-Also, it’s good to avoid using the default chain id. For this example we are going to use `271` .
+We need to clone the `matter-labs/zksync-era` repo which contains initialization script.
+Checkout branch `dr/interop-tests-with-broadcaster-server`
 
 ```bash
-zkstack ecosystem create
+git clone git@github.com:matter-labs/zksync-era.git
+cd zksync-era
+git checkout dr/interop-tests-with-broadcaster-server
+git submodule update --init --recursive
 ```
 
-![image.png](./img/zk-stack.png)
+### 1.6 - Start both chains
 
-Once everything is set, you can start your chain:
+Run the command below to start Chain A and Chain B.
+```bash
+./.github/scripts/interop.sh
+```
+
+## 2 - Deploy the Contracts
+
+### 2.1 - Clone the repo of our app
+
+In a new terminal:
 
 ```bash
-cd <your_chain>
-
-zkstack ecosystem init --dev
-
-zkstack server run
+git clone git@github.com:JackHamer09/interop-escrow-double-zero.git
+cd interop-escrow-double-zero
+git submodule update --init --recursive
 ```
 
-This is going to run all the local chain components and expose an rpc in the port 3050.
+### 2.2 - Start Interop Broadcaster server
 
-### 1.6 - Start contract verifier
-
-The contract verifier is used to check contract source code against deployed byte-code. This is going to be used in the
-explorer to display the source code and ABIs of contracts.
-
-You are going to be prompted about the versions of compilers that you want to support. Please choose solc at least
-0.8.24 and zksolc at least 1.56. This is going to be used to verify contracts of our dapp.
-
-In a new terminal run the following commands:
+In a new terminal, run the following command to start the interop broadcaster server:
 
 ```bash
-zkstack contract-verifier init
-
-zkstack contract-verifier run
+cd interop-broadcaster-server
+npm i
+npm run dev
 ```
 
-Once this is done you are going to have the verifier running in the port 3070.
+This will enable finalization of our cross-chain transactions.
 
-### 1.7 Getting some funds
+### 2.3 - Deploy the contracts
 
-At this stage you might want to send some local ETH to an address that you control. That can be done like this:
-
-Open another terminal and run the following command:
+The repo includes a script to deploy all the needed contracts together and fund your test accounts.
 
 ```bash
-npx zksync-cli \
-  bridge \
-  deposit --rpc=http://localhost:3050 \
-  --l1-rpc=http://localhost:8545
+export USER_1_CHAIN_A_ADDRESS="some_address" # wallet address that you control (for Chain A)
+export USER_2_CHAIN_B_ADDRESS="some_address_2" # second wallet address that you control (for Chain B)
+
+cd contracts
+./scripts/deploy.sh
 ```
+At the end of the process you'll see multiple contract addresses.
+Take note of them, they are going to be used in the next step.
 
-This is going to open a wizard. One of the default rich private keys is
-`0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110` , as the target you can use any address that you
-control:
+After running this script:
 
-```bash
-? Amount to deposit 111
-? Private key of the sender 0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110
-? Recipient address on L2 <your_address>
-```
+- The Escrow contracts are deployed.
+- Account 1 funded on Chain A
+- Account 2 funded on Chain B
 
-After this is done you are going to have funds ready to use in your local validium chain.
+### 2.4 - Configure double zero permissions
 
-## 2. Double Zero
+Let’s go back to the double zero repo. We have to edit this file: `environments/compose-hyperchain-permissions-a.yaml` and `environments/compose-hyperchain-permissions-b.yaml`.
+
+Update all occurrencies of `update_address_here` with the contract addresses you got from the previous step.
+
+## 3. Privacy infra
 
 Double Zero adds authentication and authorization on top of the newly created validium chain. All the services are
 written in nodejs and they are meant to be easy to run and configure. Let’s go step by step.
 
-### 2.1 - Clone the repo
+### 3.1 - Clone the repo
 
 Open a new terminal and run the following:
 
 ```bash
-# clone repo
-git clone git@github.com:Moonsong-Labs/double-zero.git
+git clone git@github.com:JackHamer09/double-zero.git
 cd double-zero
 ```
 
-### 2.2 Config
+### 3.2 Config
 
 At this stage we need to link the private chain with double zero. We are going to run the double zero services inside a
 docker a network. But they need to interact with our validium chain that is running in the host machine. The easiest way
@@ -148,11 +139,11 @@ to make this work is by connecting the validium chain using your local ip. You c
 ip:
 
 ```bash
-# linux
-ip -4 addr show wlan0 | grep -oP ‘(?<=inet\s)\d+(\.\d+){3}’ | grep -Fv 127.0.0.1
-
 # mac
 ipconfig getifaddr en0
+
+# linux
+ip -4 addr show wlan0 | grep -oP ‘(?<=inet\s)\d+(\.\d+){3}’ | grep -Fv 127.0.0.1
 
 # windows
 ipconfig
@@ -160,41 +151,14 @@ ipconfig
 
 We are going to use your ip to link the validium rpc and the contract verifier.
 
-Let’s go ahead end edit the file `environments/compose-hyperchain.env`. You should make it look this:
+Let’s go ahead and add our IP in (replace `update_with_your_local_ip` with your local ip from previous step):
 
-```bash
-# Validium chain rpc
-TARGET_RPC="http://<your-ip>:3050"
-CONTRACT_VERIFICATION_API_URL="http://<your-ip>:3070"
-
-# Conf
-CORS_ORIGIN_PROXY="http://localhost:3010"
-CORS_ORIGIN_RPC="*"
-# Secret to encript block explorer cookie. In production this has to
-# be a secure value.
-SESSION_SECRET="0101010101010101010101010101010101010101010101010101010101010101"
-# Secret used to communicate between proxy and private rpc. This
-# has to be a secure value in productioon.
-CREATE_TOKEN_SECRET="sososecret"
-
-# App
-APP_API_URL=http://localhost:4040
-APP_BRIDGE_URL=http://localhost:3000/bridge
-APP_HOSTNAMES=localhost
-APP_ICON=/images/icons/zksync-arrows.svg
-# Here you need to set your chain id
-APP_L2_CHAIN_ID=271 # <-- your chain id.
-APP_L2_NETWORK_NAME=Double Zero Local
-APP_MAINTENANCE=false
-APP_NAME=local
-APP_PUBLISHED=true
-APP_RPC_URL=http://localhost:4041
-APP_BASE_TOKEN_ADDRESS=0x000000000000000000000000000000000000800A
-```
+- `environments/compose-hyperchain-a.env`
+- `environments/compose-hyperchain-b.env`
 
 Once the configuration is in place you can run the double zero services.
 
-### 2.3 - Launch
+### 3.3 - Launch
 
 ```bash
 ./environments/launch-hyperchain-env-a.sh
@@ -207,95 +171,16 @@ after chain A infrastructure was started, start chain B infra from another termi
 ```
 
 This is going to run all the services of double zero using docker. At this stage you can check that the explorer is
-working going with your browser to [http://localhost:3010](http://localhost:3010)
+working going with your browser to:
+
+- Chain A: [http://localhost:3010](http://localhost:3010)
+- Chain B: [http://localhost:3110](http://localhost:3110)
 
 ![img/explorer.png](./img/explorer.png)
 
-Once you check that stop the process doing `CTRL-C`. We still need to configure the access to our dapp before continue.
+### 4 - Configure and run dapp frontend
 
-## 3 - Deploy dapp
-
-We are going to use an example dapp to integrate the entire stack. The dapp is a really simple constant product amm that
-can be used to make swaps between 2 tokens. Let’s start:
-
-### 3.1 - Clone the repo
-
-In a new terminal:
-
-```bash
-git clone git@github.com:Moonsong-Labs/double-zero-dapp.git
-cd double-zero-dapp
-git submodule update --init --recursive
-```
-
-### 3.2 - Deploy the contracts
-
-The repo includes a script to deploy all the needed contracts together. We are going to fund the deployment with the
-funds that you got on point `1.7` , so you are going to need the private key of that address.
-
-The following commands deploy the scripts:
-
-```bash
-export PREMIUM_USER_ADDRESS="some_address" # address that you control (for Chain A)
-export BASIC_USER_ADDRESS="some_address" # second address that you control (for Chain B)
-
-cd contracts
-./scripts/deploy.sh
-```
-At the end of the process you'll see multiple contract addresses.
-Take note of them, they are going to be used in the next step.
-
-After running this script:
-
-- The contracts are deployed.
-- The deployer was registered as a VIP user and PREMIUM_USER_ADDRESS as a premium user.
-- PREMIUM_USER_ADDRESS received test tokens on Chain A. BASIC_USER_ADDRESS received test tokens on Chain B.
-
-### 3.3 - Configure double zero permissions
-
-Let’s go back to the double zero repo. We have to edit this file: `environments/compose-hyperchain-permissions-a.yaml` and `environments/compose-hyperchain-permissions-b.yaml`
-
-This files define the access for permissions for each contract. This is what we are going to do
-
-```bash
-groups:
-  - name: admins
-    members:
-      - "<your address>" # <-- EDIT HERE
-contracts:
-  # CPAMM
-  - address: "<cpamm_address>" # <-- EDIT HERE
-    methods:
-      #...
-  # TradeEscrow.sol
-  - address: "<trade_escrow_address>" # <-- EDIT HERE
-    methods:
-      #...
-  # USDG
-  - address: "<usdg_address>" # <-- EDIT HERE
-    methods:
-      # ...
-  # wAAPL
-  - address: "<waapl_address>" # <-- EDIT HERE
-    methods:
-      # ...
-```
-
-Now you can run all the double zero services for both chains, this time we are going to leave them up:
-
-```bash
-./environments/launch-hyperchain-env-a.sh
-```
-
-after chain A infrastructure was started, start chain B infra from another terminal:
-
-```bash
-./environments/launch-hyperchain-env-b.sh
-```
-
-### 3.4 - Configure and run dapp frontend
-
-In a new termnal, go to the root of the dapp and run the following command:
+In a new termnal, go to the root of the `interop-escrow-double-zero` and run the following command:
 
 ```bash
 cd web
@@ -306,18 +191,22 @@ Now edit the .env file by filling missing contract addresses.
 
 ### 3.5 - Run the frontend of the dapp
 
-The dapp front end needs pnpm to be executed. You can follow their instructions to get
-it: [https://pnpm.io/installation](https://pnpm.io/installation)
-
-Once pnpm is installed you can go ahead and start the dapp frontend:
-
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Now, you can go to [localhost:3000](http://localhost:3000) to see your dapp running.
+Now, you can go to [localhost:3000/trade](http://localhost:3000/trade) to see your dapp running.
 
-![zerozeroswap.png](./img/zerozeroswap.png)
+### 4 - Authorizing RPC
 
-You can connect your metamask wallet to the double zero rpc through the explorer. And then you can use the app.
+To Authorize RPC for each chain you need to go:
+
+- For **Account 1 on Chain A** account: can be done directly on the DApp by authorizing the RPC and the adding the network **OR** by going to the explorer login page [http://localhost:3010/login](http://localhost:3010/login) and authorizing the RPC there.
+- For **Account 2 on Chain B** account: can be done ONLY by going to the explorer login page [http://localhost:3110/login](http://localhost:3110/login) and authorizing the RPC there.
+
+---
+
+### Limitations
+
+- Right now you can only propose a trade from chain A. 
