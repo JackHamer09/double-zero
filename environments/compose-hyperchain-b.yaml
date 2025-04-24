@@ -6,7 +6,6 @@ services:
       dockerfile: ./packages/app/Dockerfile
       args:
         VITE_API_URL: ${APP_API_URL}
-        VITE_BRIDGE_URL: ${APP_BRIDGE_URL}
         VITE_HOSTNAMES: ${APP_HOSTNAMES}
         VITE_ICON: ${APP_ICON}
         VITE_L2_CHAIN_ID: ${APP_L2_CHAIN_ID}
@@ -16,10 +15,12 @@ services:
         VITE_PUBLISHED: ${APP_PUBLISHED}
         VITE_RPC_URL: ${APP_RPC_URL}
         VITE_BASE_TOKEN_ADDRESS: ${APP_BASE_TOKEN_ADDRESS}
+        VITE_L1_EXPLORER_URL: ${APP_GATEWAY_EXPLORER_URL}
     ports:
       - '3110:3010'
     depends_on:
       - proxy
+      - private-rpc
     restart: unless-stopped
 
   data-fetcher:
@@ -116,6 +117,7 @@ services:
       PERMISSIONS_YAML_PATH: "/app/permissions.yaml"
       CORS_ORIGIN: ${CORS_ORIGIN_RPC}
       CREATE_TOKEN_SECRET: ${CREATE_TOKEN_SECRET}
+    restart: unless-stopped
 
   db-private-rpc:
     image: "postgres:14"

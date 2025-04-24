@@ -21,7 +21,7 @@ export const env = createEnv({
     VITE_API_URL: z.string().url(),
     VITE_APP_ENVIRONMENT: z.string().optional(),
     VITE_BASE_TOKEN_ADDRESS: z.string(),
-    VITE_BRIDGE_URL: z.string().url(),
+    VITE_BRIDGE_URL: z.string().url().optional(),
     VITE_HOSTNAMES: arraySchema,
     VITE_ICON: z.string(),
     VITE_L1_EXPLORER_URL: z.string().url().optional(),

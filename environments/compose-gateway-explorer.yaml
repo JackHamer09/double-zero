@@ -1,0 +1,77 @@
+name: 'chain-gateway'
+services:
+  app:
+    platform: linux/amd64
+    image: "matterlabs/block-explorer-app:${BLOCK_EXPLORER_VERSION}"
+    volumes:
+      - ./gateway-explorer-config.js:/usr/src/app/packages/app/dist/config.js
+    ports:
+      - '3210:3010'
+    restart: unless-stopped
+
+  data-fetcher:
+    platform: linux/amd64
+    image: "matterlabs/block-explorer-data-fetcher:${BLOCK_EXPLORER_VERSION}"
+    environment:
+      PORT: "3240"
+      LOG_LEVEL: "verbose"
+      BLOCKCHAIN_RPC_URL: ${TARGET_RPC}
+    restart: on-failure
+
+  worker:
+    platform: linux/amd64
+    image: "matterlabs/block-explorer-worker:${BLOCK_EXPLORER_VERSION}"
+    environment:
+      PORT: "3201"
+      LOG_LEVEL: "verbose"
+      DATABASE_HOST: "explorer-db"
+      DATABASE_PORT: "5632"
+      DATABASE_USER: "postgres"
+      DATABASE_PASSWORD: "postgres"
+      DATABASE_NAME: "block-explorer"
+      BLOCKCHAIN_RPC_URL: ${TARGET_RPC}
+      DATA_FETCHER_URL: "http://data-fetcher:3240"
+      BATCHES_PROCESSING_POLLING_INTERVAL: "1000"
+    depends_on:
+      data-fetcher:
+        condition: service_started
+      explorer-db:
+        condition: service_healthy
+    restart: on-failure
+
+  api:
+    platform: linux/amd64
+    image: "matterlabs/block-explorer-api:${BLOCK_EXPLORER_VERSION}"
+    ports:
+      - "3221:3221"
+    environment:
+      PORT: "3221"
+      METRICS_PORT: "3205"
+      LOG_LEVEL: "verbose"
+      DATABASE_URL: "postgres://postgres:postgres@explorer-db:5632/block-explorer"
+      CONTRACT_VERIFICATION_API_URL: ${CONTRACT_VERIFICATION_API_URL}
+    depends_on:
+      - worker
+    restart: unless-stopped
+
+  explorer-db:
+    image: "postgres:14"
+    logging:
+      driver: none
+    volumes:
+      - explorer-db:/var/lib/postgresql/data
+    ports:
+      - "5633:5632"
+    command: ["postgres", "-p", "5632"]
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -p 5632" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "block-explorer"
+
+volumes:
+  explorer-db:

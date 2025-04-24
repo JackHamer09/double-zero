@@ -133,6 +133,7 @@ We’ll run Double Zero services in Docker, connecting them to our local chains 
 2. **Configure environment files** in the `double-zero` directory:
    - `environments/compose-hyperchain-a.env`
    - `environments/compose-hyperchain-b.env`
+   - (Optional) `environments/compose-gateway-explorer.env`
    
    Set your local IP for the RPC endpoints.
 
@@ -144,6 +145,11 @@ We’ll run Double Zero services in Docker, connecting them to our local chains 
 4. **Launch Chain B services** in another terminal:
    ```bash
    ./environments/launch-hyperchain-env-b.sh
+   ```
+
+5. (Optional) **Launch Gateway Explorer** in another terminal:
+   ```bash
+   ./environments/launch-gateway-explorer.sh
    ```
 
 ---
