@@ -64,6 +64,11 @@ contracts:
           type: public
         write:
           type: public
+      - signature: function acceptAndDeposit(uint256)
+        read:
+          type: public
+        write:
+          type: public
       - signature: function getMySwaps(address)
         read:
           type: checkArgument
