@@ -1,4 +1,4 @@
-name: 'chain-gateway'
+name: 'chain-gateway-explorer'
 services:
   app:
     platform: linux/amd64
