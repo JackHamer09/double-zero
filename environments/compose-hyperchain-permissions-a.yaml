@@ -3,49 +3,6 @@ groups:
     members:
       - "0x36615Cf349d7F6344891B1e7CA7C72883F5dc049" # Default Rich account
 contracts:
-  # CPAMM
-  - address: "<update_address_here>"
-    methods:
-      - signature: function getReserves() external view returns (uint256, uint256)
-        read:
-          type: public
-        write:
-          type: closed
-      - signature: function swap(address _tokenIn, uint256 _amountIn) external returns (uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function allowedToAddLiquidity()
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function addLiquidity(uint256 _amount0, uint256 _amount1) external returns (uint256 shares)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function removeLiquidity(uint256 _shares) external returns (uint256 amount0, uint256 amount1)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function getUserFee(address user) returns (uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function getRemainingDailyAllowance(address) returns (uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function balanceOf(address) returns (uint256)
-        read:
-          type: public
-        write:
-          type: closed
   # TradeEscrow.sol
   - address: "<update_address_here>"
     methods:
@@ -95,7 +52,7 @@ contracts:
           type: closed
         write:
           type: closed
-  # USDG
+  # USDC
   - address: "<update_address_here>"
     methods:
       - signature: function decimals() public view virtual returns (uint8)
@@ -187,7 +144,7 @@ contracts:
           type: public
         write:
           type: public
-  # wAAPL
+  # TTBILL
   - address: "<update_address_here>"
     methods:
       - signature: function decimals() public view virtual returns (uint8)

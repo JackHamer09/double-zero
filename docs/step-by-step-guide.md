@@ -22,42 +22,20 @@ Ensure you have the following tools installed. Click each dropdown for installat
 
   Follow Docker’s official instructions for your OS:
   - https://docs.docker.com/engine/install/
-  ```bash
-  # Example for Ubuntu
-  sudo apt-get update
-  sudo apt-get install \
-    ca-certificates \
-    curl \
-    gnupg \
-    lsb-release
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-  echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
-    https://download.docker.com/linux/ubuntu \
-    $(lsb_release -cs) stable" | \
-    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-  sudo apt-get update
-  sudo apt-get install docker-ce docker-ce-cli containerd.io
-  ```
 </details>
 
 <details>
   <summary><strong>3. Foundry (zksync-foundry)</strong></summary>
 
   Install Foundry following the ZKsync documentation:
-  ```bash
-  curl -L https://foundry.paradigm.xyz | bash
-  foundryup
-  ```
+  - https://docs.zksync.io/zksync-era/tooling/foundry/installation
 </details>
 
 <details>
   <summary><strong>4. zkstack (via zkstackup)</strong></summary>
 
-  ```bash
-  curl -L https://raw.githubusercontent.com/matter-labs/zksync-era/main/zkstack_cli/zkstackup/install | bash
-  zkstackup
-  ```
+  Install zkstack following the ZK Stack documentation:
+  - https://docs.zksync.io/zk-stack/running/quickstart#install-zk-stack-cli
 </details>
 
 <details>
@@ -93,8 +71,8 @@ git submodule update --init --recursive
 
 # Start the Interop Broadcaster
 cd interop-broadcaster-server
-npm install
-npm run dev
+pnpm i
+pnpm run dev
 
 # Set wallet addresses
 export USER_1_CHAIN_A_ADDRESS=0xYourAddressOnChainA
@@ -107,54 +85,54 @@ cd ../contracts
 
 After completion, note the contract addresses for Chain A and Chain B.
 
-## 3. Clone & Configure Double Zero Services
+## 3. Clone, Configure & Launch Privacy Services
 
-First, clone the Double Zero repository:
+`Double Zero` provides a private RPC proxy with fine-grained access control.
 
-```bash
-git clone git@github.com:JackHamer09/double-zero.git
-cd double-zero
-```
+1. **Clone the Double Zero repo**:
+   ```bash
+   git clone git@github.com:JackHamer09/double-zero.git
+   cd double-zero
+   ```
 
-Double Zero provides a private RPC proxy with fine-grained access control. Edit the permission files and replace `update_address_here` with your deployed escrow contract addresses:
+2. **Set contract addresses**:
+   Edit the permission files and replace `update_address_here` with your deployed escrow contract addresses:
+   - `environments/compose-hyperchain-permissions-a.yaml`
+   - `environments/compose-hyperchain-permissions-b.yaml`
 
-- `environments/compose-hyperchain-permissions-a.yaml`
-- `environments/compose-hyperchain-permissions-b.yaml`
+3. **Set up the environment**:
+   We’ll run Double Zero services in Docker, connecting them to our local chains via your machine’s IP.
 
-## 4. Launch Double Zero Services
-
-We’ll run Double Zero services in Docker, connecting them to our local chains via your machine’s IP.
-
-1. **Find your local IP**:
+3.1. **Find your local IP**:
    - macOS: `ipconfig getifaddr en0`
    - Linux: `ip -4 addr show wlan0 | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}'`
    - Windows: check under your network adapter in `ipconfig`
 
-2. **Configure environment files** in the `double-zero` directory:
+3.2. **Configure environment files** in the `double-zero` directory:
    - `environments/compose-hyperchain-a.env`
    - `environments/compose-hyperchain-b.env`
    - (Optional) `environments/compose-gateway-explorer.env`
-   
-   Set your local IP for the RPC endpoints.
 
-3. **Launch Chain A services**:
+4. **Launch Double Zero services**
+
+4.1. **Launch Chain A services**:
    ```bash
    ./environments/launch-hyperchain-env-a.sh
    ```
 
-4. **Launch Chain B services** in another terminal:
+4.2. **Launch Chain B services** in another terminal:
    ```bash
    ./environments/launch-hyperchain-env-b.sh
    ```
 
-5. (Optional) **Launch Gateway Explorer** in another terminal:
+4.3. (Optional) **Launch Gateway Explorer** in another terminal:
    ```bash
    ./environments/launch-gateway-explorer.sh
    ```
 
 ---
 
-## 5. Verify Explorers & Authorize Access
+## 4. Verify Explorers & Authorize Access
 
 1. **Visit your address page**:
    - **Chain A (Account 1)**: [http://localhost:3010/address/{USER_1_CHAIN_A_ADDRESS}](http://localhost:3010)
@@ -164,7 +142,7 @@ We’ll run Double Zero services in Docker, connecting them to our local chains 
    - Click **Login** on the top right corner, connect the corresponding wallet, and follow the prompts to authorize access.
    - After login, click **Add Network** to register your private RPC URL for your address with your MetaMask wallet.
 
-## 6. Run the Demo App
+## 5. Run the Escrow Trade Demo App
 
 Back to `interop-escrow-double-zero` repo:
 ```bash
@@ -176,7 +154,7 @@ pnpm install
 pnpm dev
 ```
 
-Now open the app: http://localhost:3000/trade
+Now open the Escrow Trade app: http://localhost:3000
 
 ## Troubleshooting
 

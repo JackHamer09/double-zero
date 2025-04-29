@@ -3,7 +3,7 @@ groups:
     members:
       - "0x36615Cf349d7F6344891B1e7CA7C72883F5dc049" # Default Rich account
 contracts:
-  # USDG
+  # USDC
   - address: "<update_address_here>"
     methods:
       - signature: function decimals() public view virtual returns (uint8)
@@ -95,7 +95,7 @@ contracts:
           type: public
         write:
           type: public
-  # wAAPL
+  # TTBILL
   - address: "<update_address_here>"
     methods:
       - signature: function decimals() public view virtual returns (uint8)
