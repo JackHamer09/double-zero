@@ -46,9 +46,9 @@ Ensure you have the following tools installed. Click each dropdown for installat
   - **Windows (WSL)**: `sudo apt-get install jq`
 </details>
 
-## 1. Deploy Two Private Chains
+## 1. Start Two Validium Chains
 
-We'll use **zkstack** to run two private validium chains (Chain A and Chain B).
+We'll use **zkstack** to run two validium chains (Chain A and Chain B).
 
 ```bash
 # Clone & prepare the zksync-era repo
@@ -61,7 +61,7 @@ git submodule update --init --recursive
 ./.github/scripts/interop.sh
 ```
 
-## 2. Deploy Escrow Contracts
+## 2. Deploy Escrow and Token Contracts
 
 ```bash
 # Clone the escrow demo repo
@@ -75,6 +75,7 @@ pnpm i
 pnpm run dev
 
 # Set wallet addresses
+# Tokens will be minted to these addresses
 export USER_1_CHAIN_A_ADDRESS=0xYourAddressOnChainA
 export USER_2_CHAIN_B_ADDRESS=0xYourAddressOnChainB
 
