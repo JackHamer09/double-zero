@@ -323,7 +323,7 @@ const badges = computed(() => {
   badgesArr.push({
     testId: 'l2-badge-title',
     color: 'success',
-    text: t('general.l2NetworkName'),
+    text: currentNetwork.value.l2NetworkName,
     textColor: 'neutral',
   });
   badgesArr.push({

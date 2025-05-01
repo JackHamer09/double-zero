@@ -3,20 +3,10 @@ groups:
     members:
       - "0x36615Cf349d7F6344891B1e7CA7C72883F5dc049" # Default Rich account
 contracts:
-  # TradeEscrow.sol
+  # TradeEscrow
   - address: "<update_address_here>"
     methods:
-      - signature: function acceptTrade(uint256)
-        read:
-          type: public
-        write:
-          type: public
       - signature: function cancelTrade(uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function deposit(uint256)
         read:
           type: public
         write:
@@ -32,7 +22,7 @@ contracts:
           argIndex: 0
         write:
           type: public
-      - signature: function proposeTrade(address,uint256,address,uint256,address,uint256)
+      - signature: function proposeTradeAndDeposit(address,uint256,address,uint256,address,uint256)
         read:
           type: public
         write:

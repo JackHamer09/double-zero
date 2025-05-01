@@ -1,7 +1,7 @@
 {
     "general": {
         "l2NetworkName": "ZKsync Era",
-        "l1NetworkName": "Ethereum"
+        "l1NetworkName": "Gateway"
     },
     "copyButton": {
         "tooltip": "Скопійовано!"
