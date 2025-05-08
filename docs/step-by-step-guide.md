@@ -100,44 +100,45 @@ After completion, note the contract addresses for Chain A and Chain B.
 3. **Set up the environment**:
    We’ll run Double Zero services in Docker, connecting them to our local chains via your machine’s IP.
 
-3.1. **Find your local IP**:
-   - macOS: `ipconfig getifaddr en0`
-   - Linux: `ip -4 addr show wlan0 | grep -oP '(?<=inet\\s)\\d+(\\.\\d+){3}'`
-   - Windows: check under your network adapter in `ipconfig`
+   3.1. **Find your local IP**:
+      - macOS: `ipconfig getifaddr en0`
+      - Linux: `ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}'`
+      - Windows: check under your network adapter in `ipconfig`
 
-3.2. **Configure environment files** in the `double-zero` directory:
-   - `environments/compose-hyperchain-a.env`
-   - `environments/compose-hyperchain-b.env`
-   - (Optional) `environments/compose-gateway-explorer.env`
+   3.2. **Configure environment files** in the `double-zero` directory:
+      - `environments/compose-hyperchain-a.env`
+      - `environments/compose-hyperchain-b.env`
+      - (Optional) `environments/compose-gateway-explorer.env`
+
 
 4. **Launch Double Zero services**
 
-4.1. **Launch Chain A services**:
-   ```bash
-   ./environments/launch-hyperchain-env-a.sh
-   ```
+   4.1. **Launch Chain A services**:
+      ```bash
+      ./environments/launch-hyperchain-env-a.sh
+      ```
 
-4.2. **Launch Chain B services** in another terminal:
-   ```bash
-   ./environments/launch-hyperchain-env-b.sh
-   ```
+   4.2. **Launch Chain B services** in another terminal:
+      ```bash
+      ./environments/launch-hyperchain-env-b.sh
+      ```
 
-4.3. (Optional) **Launch Gateway Explorer** in another terminal:
-   ```bash
-   ./environments/launch-gateway-explorer.sh
-   ```
+   4.3. (Optional) **Launch Gateway Explorer** in another terminal:
+      ```bash
+      ./environments/launch-gateway-explorer.sh
+      ```
 
 ---
 
 ## 4. Verify Explorers & Authorize Access
 
-1. **Visit your address page**:
-   - **Chain A (Account 1)**: [http://localhost:3010/address/{USER_1_CHAIN_A_ADDRESS}](http://localhost:3010)
-   - **Chain B (Account 2)**: [http://localhost:3110/address/{USER_2_CHAIN_B_ADDRESS}](http://localhost:3110)
+   1. **Visit your address page**:
+      - **Chain A (Account 1)**: [http://localhost:3010/address/{USER_1_CHAIN_A_ADDRESS}](http://localhost:3010)
+      - **Chain B (Account 2)**: [http://localhost:3110/address/{USER_2_CHAIN_B_ADDRESS}](http://localhost:3110)
 
-2. If you see **"Access Restricted"**, complete the following on the respective explorer:
-   - Click **Login** on the top right corner, connect the corresponding wallet, and follow the prompts to authorize access.
-   - After login, click **Add Network** to register your private RPC URL for your address with your MetaMask wallet.
+   2. If you see **"Access Restricted"**, complete the following on the respective explorer:
+      - Click **Login** on the top right corner, connect the corresponding wallet, and follow the prompts to authorize access.
+      - After login, click **Add Network** to register your private RPC URL for your address with your MetaMask wallet.
 
 ## 5. Run the Escrow Trade Demo App
 
@@ -152,6 +153,8 @@ pnpm dev
 ```
 
 Now open the Escrow Trade app: http://localhost:3000
+
+---
 
 ## Troubleshooting
 
