@@ -32,14 +32,7 @@ Ensure you have the following tools installed. Click each dropdown for installat
 </details>
 
 <details>
-  <summary><strong>4. zkstack (via zkstackup)</strong></summary>
-
-  Install zkstack following the ZK Stack documentation:
-  - https://docs.zksync.io/zk-stack/running/quickstart#install-zk-stack-cli
-</details>
-
-<details>
-  <summary><strong>5. jq</strong></summary>
+  <summary><strong>4. jq</strong></summary>
 
   - **macOS**: `brew install jq`
   - **Ubuntu**: `sudo apt-get install jq`
@@ -57,7 +50,10 @@ cd zksync-era
 git checkout dr/interop-tests-with-broadcaster-server
 git submodule update --init --recursive
 
-# Start both chains
+# Install zkstack from source
+cargo install --path zkstack_cli/crates/zkstack --force --locked --features gateway
+
+# Start both chains + gateway
 ./.github/scripts/interop.sh
 ```
 
