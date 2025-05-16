@@ -1,6 +1,6 @@
 # Environments
 
-In this folder there are a few simple configurations to try Double Zero in a local environment,
+In this folder there are a few simple configurations to try ZKsync Prividium in a local environment,
 but in a close to production state.
 
 ### Proxy mode
@@ -26,7 +26,7 @@ Permissions can be configured editing [this](./compose-proxy-permissions.yaml) f
 
 ### Hyperchain mode
 
-This configuration is meant to target any hyperchain. In particular double zero
+This configuration is meant to target any hyperchain. In particular prividium
 was meant thinking on private access for a validium chain. You can find more info
 about how to create your own validium chain [here](#spawning-a-local-validium-chain)
 

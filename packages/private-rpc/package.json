@@ -1,8 +1,8 @@
 {
   "name": "private-rpc",
   "version": "0.0.0",
-  "title": "Double zero rpc proxy",
-  "description": "Double zero rpc proxy",
+  "title": "prividium rpc proxy",
+  "description": "prividium rpc proxy",
   "author": "Moonsong labs",
   "private": true,
   "license": "MIT",

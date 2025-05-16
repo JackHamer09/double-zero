@@ -1,7 +1,7 @@
 Escrow Trade Demo Between Private Chains
 ========================================
 
-This guide walks you through setting up a local escrow trade demo between two private ZKsync-compatible chains using Double Zero and Interop. The demo spins up two isolated chains, deploys escrow contracts, and leverages an interoperability layer to settle cross-chain trades confidentially.
+This guide walks you through setting up a local escrow trade demo between two private ZKsync-compatible chains using ZKsync Prividium and Interop. The demo spins up two isolated chains, deploys escrow contracts, and leverages an interoperability layer to settle cross-chain trades confidentially.
 
 ## Prerequisites
 
@@ -84,9 +84,9 @@ After completion, note the contract addresses for Chain A and Chain B.
 
 ## 3. Clone, Configure & Launch Privacy Services
 
-`Double Zero` provides a private RPC proxy with fine-grained access control.
+`ZKsync Prividium` provides a private RPC proxy with fine-grained access control.
 
-1. **Clone the Double Zero repo**:
+1. **Clone the ZKsync Prividium repo**:
    ```bash
    git clone git@github.com:JackHamer09/double-zero.git
    cd double-zero
@@ -98,7 +98,7 @@ After completion, note the contract addresses for Chain A and Chain B.
    - `environments/compose-hyperchain-permissions-b.yaml`
 
 3. **Set up the environment**:
-   We’ll run Double Zero services in Docker, connecting them to our local chains via your machine’s IP.
+   We’ll run ZKsync Prividium services in Docker, connecting them to our local chains via your machine’s IP.
 
    3.1. **Find your local IP**:
       - macOS: `ipconfig getifaddr en0`
@@ -111,7 +111,7 @@ After completion, note the contract addresses for Chain A and Chain B.
       - (Optional) `environments/compose-gateway-explorer.env`
 
 
-4. **Launch Double Zero services**
+4. **Launch ZKsync Prividium services**
 
    4.1. **Launch Chain A services**:
       ```bash

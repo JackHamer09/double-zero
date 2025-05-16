@@ -1,4 +1,4 @@
-# Double zero block explorer proxy
+# Prividium block explorer proxy
 
 Proxy meant to add authorization in data returned by explorer.
 
