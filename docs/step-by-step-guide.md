@@ -51,10 +51,10 @@ git checkout dr/interop-tests-with-broadcaster-server
 git submodule update --init --recursive
 
 # Install zkstack from source
-cargo install --path zkstack_cli/crates/zkstack --force --locked --features gateway
+cargo install --path zkstack_cli/crates/zkstack --force --locked
 
 # Start both chains + gateway
-./.github/scripts/interop.sh
+./infrastructure/scripts/interop.sh
 ```
 
 ## 2. Deploy Escrow and Token Contracts
