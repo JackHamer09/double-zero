@@ -5,7 +5,7 @@ window['##runtimeConfig'] = {
       apiUrl: "http://localhost:3221",
       hostnames: ["localhost"],
       icon: "/images/icons/zksync-arrows.svg",
-      l2ChainId: 506,
+      l2ChainId: 507,
       l2NetworkName: "Gateway",
       maintenance: false,
       name: "local",

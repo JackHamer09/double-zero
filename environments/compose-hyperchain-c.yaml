@@ -1,0 +1,161 @@
+name: 'private-chain-c'
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: ./packages/app/Dockerfile
+      args:
+        VITE_API_URL: ${APP_API_URL}
+        VITE_HOSTNAMES: ${APP_HOSTNAMES}
+        VITE_ICON: ${APP_ICON}
+        VITE_L2_CHAIN_ID: ${APP_L2_CHAIN_ID}
+        VITE_L2_NETWORK_NAME: ${APP_L2_NETWORK_NAME}
+        VITE_MAINTENANCE: ${APP_MAINTENANCE}
+        VITE_NAME: ${APP_NAME}
+        VITE_PUBLISHED: ${APP_PUBLISHED}
+        VITE_RPC_URL: ${APP_RPC_URL}
+        VITE_BASE_TOKEN_ADDRESS: ${APP_BASE_TOKEN_ADDRESS}
+        VITE_L1_EXPLORER_URL: ${APP_GATEWAY_EXPLORER_URL}
+    ports:
+      - '3210:3010'
+    depends_on:
+      - proxy
+      - private-rpc
+    restart: unless-stopped
+
+  data-fetcher:
+    build:
+      context: ..
+      dockerfile: ./packages/data-fetcher/Dockerfile
+    environment:
+      PORT: "3240"
+      LOG_LEVEL: "verbose"
+      BLOCKCHAIN_RPC_URL: ${TARGET_RPC}
+    restart: on-failure
+
+  worker:
+    build:
+      context: ..
+      dockerfile: ./packages/worker/Dockerfile
+    environment:
+      PORT: "3201"
+      LOG_LEVEL: "verbose"
+      DATABASE_HOST: "explorer-db"
+      DATABASE_PORT: "5632"
+      DATABASE_USER: "postgres"
+      DATABASE_PASSWORD: "postgres"
+      DATABASE_NAME: "block-explorer"
+      BLOCKCHAIN_RPC_URL: ${TARGET_RPC}
+      DATA_FETCHER_URL: "http://data-fetcher:3240"
+      BATCHES_PROCESSING_POLLING_INTERVAL: "1000"
+    depends_on:
+      data-fetcher:
+        condition: service_started
+      explorer-db:
+        condition: service_healthy
+    restart: on-failure
+
+  api:
+    build:
+      context: ..
+      dockerfile: ./packages/api/Dockerfile
+    ports:
+      - "3221:3221"
+    environment:
+      PORT: "3221"
+      METRICS_PORT: "3205"
+      LOG_LEVEL: "verbose"
+      DATABASE_URL: "postgres://postgres:postgres@explorer-db:5632/block-explorer"
+      CONTRACT_VERIFICATION_API_URL: ${CONTRACT_VERIFICATION_API_URL}
+    depends_on:
+      - worker
+    restart: unless-stopped
+
+  proxy:
+    build:
+      context: ..
+      dockerfile: ./packages/proxy/Dockerfile
+    ports:
+      - "4240:4240"
+    environment:
+      SERVER_PORT: 4240
+      BLOCK_EXPLORER_API_URL: http://api:3221
+      SESSION_SECRET: "0101010101010101010101010101010101010101010101010101010101010101"
+      CORS_ORIGIN: ${CORS_ORIGIN_PROXY}
+      RPC_URL: ${TARGET_RPC}
+      USER_TOKEN_URL: http://private-rpc:4241/users
+      CREATE_TOKEN_SECRET: ${CREATE_TOKEN_SECRET}
+
+  private-rpc-migrate:
+    build:
+      context: ..
+      dockerfile: ./packages/private-rpc/Dockerfile
+    command: sh -c "yarn db:migrate"
+    depends_on:
+      db-private-rpc:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@db-private-rpc:5532/private-rpc"
+
+  private-rpc:
+    build:
+      context: ..
+      dockerfile: ./packages/private-rpc/Dockerfile
+    volumes:
+      - ./compose-hyperchain-permissions-b.yaml:/app/permissions.yaml
+    depends_on:
+      db-private-rpc:
+        condition: service_healthy
+      private-rpc-migrate:
+        condition: service_completed_successfully
+    ports:
+      - '4241:4241'
+    environment:
+      PORT: "4241"
+      DATABASE_URL: "postgres://postgres:postgres@db-private-rpc:5632/private-rpc"
+      TARGET_RPC: ${TARGET_RPC}
+      PERMISSIONS_YAML_PATH: "/app/permissions.yaml"
+      CORS_ORIGIN: ${CORS_ORIGIN_RPC}
+      CREATE_TOKEN_SECRET: ${CREATE_TOKEN_SECRET}
+    restart: unless-stopped
+
+  db-private-rpc:
+    image: "postgres:14"
+    logging:
+      driver: none
+    volumes:
+      - db-private-rpc:/var/lib/postgresql/data
+    command: ["postgres", "-p", "5632"]
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -p 5632" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=private-rpc
+
+  explorer-db:
+    image: "postgres:14"
+    logging:
+      driver: none
+    volumes:
+      - explorer-db:/var/lib/postgresql/data
+    ports:
+      - "5633:5632"
+    command: ["postgres", "-p", "5632"]
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -p 5632" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "block-explorer"
+
+
+volumes:
+  db-private-rpc:
+  explorer-db:

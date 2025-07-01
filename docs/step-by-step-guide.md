@@ -96,6 +96,7 @@ After completion, note the contract addresses for Chain A and Chain B.
    Edit the permission files and replace `update_address_here` with your deployed escrow contract addresses:
    - `environments/compose-hyperchain-permissions-a.yaml`
    - `environments/compose-hyperchain-permissions-b.yaml`
+   - `environments/compose-hyperchain-permissions-c.yaml`
 
 3. **Set up the environment**:
    We’ll run ZKsync Prividium services in Docker, connecting them to our local chains via your machine’s IP.
@@ -108,6 +109,7 @@ After completion, note the contract addresses for Chain A and Chain B.
    3.2. **Configure environment files** in the `double-zero` directory:
       - `environments/compose-hyperchain-a.env`
       - `environments/compose-hyperchain-b.env`
+      - `environments/compose-hyperchain-c.env`
       - (Optional) `environments/compose-gateway-explorer.env`
 
 
@@ -123,7 +125,12 @@ After completion, note the contract addresses for Chain A and Chain B.
       ./environments/launch-hyperchain-env-b.sh
       ```
 
-   4.3. (Optional) **Launch Gateway Explorer** in another terminal:
+   4.3. **Launch Chain C services** in another terminal:
+      ```bash
+      ./environments/launch-hyperchain-env-c.sh
+      ```
+
+   4.4. (Optional) **Launch Gateway Explorer** in another terminal:
       ```bash
       ./environments/launch-gateway-explorer.sh
       ```

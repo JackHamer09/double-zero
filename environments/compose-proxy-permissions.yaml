@@ -95,7 +95,7 @@ contracts:
           type: public
         write:
           type: public
-      - signature: function puclicThreshold(address target) public view returns (uint256, bool)
+      - signature: function publicThreshold(address target) public view returns (uint256, bool)
         read:
           type: public
         write:
@@ -182,7 +182,7 @@ contracts:
           type: public
         write:
           type: public
-      - signature: function puclicThreshold(address target) public view returns (uint256, bool)
+      - signature: function publicThreshold(address target) public view returns (uint256, bool)
         read:
           type: public
         write:

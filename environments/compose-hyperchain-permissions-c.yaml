@@ -3,118 +3,80 @@ groups:
     members:
       - "0x36615Cf349d7F6344891B1e7CA7C72883F5dc049" # Default Rich account
 contracts:
-  # TradeEscrow
-  - address: "0xB66f41d8b7937Bd06F40cE3A89612a293903d414"
+  # InvoicePayment
+  - address: "0x8B4746a24f4F8eD5Dbfe7597902806f7Cd6790fe"
     methods:
-      - signature: function cancelTrade(uint256)
+      - signature: function cancelInvoice(uint256)
         read:
           type: public
         write:
           type: public
-      - signature: function acceptAndDeposit(uint256)
+      - signature: function createInvoice(address,uint256,address,uint256,uint256,address,address,string)
         read:
           type: public
         write:
           type: public
-      - signature: function getMySwaps(address)
-        read:
-          type: checkArgument
-          argIndex: 0
-        write:
-          type: public
-      - signature: function proposeTradeAndDeposit(address,uint256,address,uint256,address,uint256)
+      - signature: function exchangeRates(address,address)
         read:
           type: public
         write:
           type: public
-      - signature: function tradeCounter()
-        read:
-          type: closed
-        write:
-          type: closed
-      - signature: function trades(uint256)
-        read:
-          type: closed
-        write:
-          type: closed
-      - signature: function userTrades(address,uint256)
-        read:
-          type: closed
-        write:
-          type: closed
-  # RepoContract
-  - address: "0x554e73Ba6E098662ca26572e26784560d9DFD894"
-    methods:
-      - signature: function acceptOffer(uint256,uint256,address)
+      - signature: function getInvoiceDetails(uint256)
         read:
           type: public
         write:
           type: public
-      - signature: function cancelOffer(uint256)
+      - signature: function getMultipleInvoiceDetails(uint256[])
         read:
           type: public
         write:
           type: public
-      - signature: function calculateRepaymentAmount(uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function claimCollateral(uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function createOffer(address,uint256,address,uint256,uint256,uint256,address,uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function getBorrowerOffers(address)
+      - signature: function getUserAllInvoices(address,uint256,uint256,uint256,uint256)
         read:
           type: checkArgument
           argIndex: 0
         write:
           type: public
-      - signature: function getLenderOffers(address)
+      - signature: function getConversionAmount(address,address,uint256)
+        read:
+          type: public
+        write:
+          type: public
+      - signature: function getWhitelistedTokens()
+        read:
+          type: public
+        write:
+          type: public
+      - signature: function whitelistedTokens(address)
+        read:
+          type: public
+        write:
+          type: public
+      - signature: function getUserCreatedInvoices(address,uint256,uint256)
         read:
           type: checkArgument
           argIndex: 0
         write:
           type: public
-      - signature: function userBorrowerOffers(address,uint256)
+      - signature: function getUserCreatedInvoiceCount(address)
         read:
           type: checkArgument
           argIndex: 0
         write:
           type: public
-      - signature: function userLenderOffers(address,uint256)
+      - signature: function getUserPendingInvoices(address,uint256,uint256)
         read:
           type: checkArgument
           argIndex: 0
         write:
           type: public
-      - signature: function getOpenOffers()
+      - signature: function getUserPendingInvoiceCount(address)
         read:
-          type: public
+          type: checkArgument
+          argIndex: 0
         write:
           type: public
-      - signature: function gracePeriod()
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function offerCounter()
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function offers(uint256)
-        read:
-          type: public
-        write:
-          type: public
-      - signature: function repayLoan(uint256)
+      - signature: function payInvoice(uint256,address)
         read:
           type: public
         write:
